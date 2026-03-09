@@ -1,0 +1,369 @@
+/* ---- Reset & Base ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0a0a1a;
+  --surface: #12122a;
+  --surface2: #1a1a3e;
+  --border: #2a2a5a;
+  --text: #e0e0f0;
+  --text-dim: #8888aa;
+  --accent: #4fc3f7;
+  --accent2: #42a5f5;
+  --success: #4caf50;
+  --warn: #ff9800;
+  --danger: #ef5350;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ---- App Layout ---- */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  text-align: center;
+  padding: 28px 16px 14px;
+  background: linear-gradient(180deg, #12122a 0%, transparent 100%);
+}
+
+.app-header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #ba68c8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 1.15rem;
+  margin-top: 6px;
+}
+
+/* ---- Main: Stats full-width on top, then [sidebar | canvas] row ---- */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.main-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* ---- Sidebar (Control Panel) ---- */
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+/* ---- Canvas ---- */
+.canvas-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 450px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-dim);
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+/* ---- Control Panel (vertical) ---- */
+.control-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.control-panel h2 {
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+  color: var(--accent);
+}
+
+.control-group {
+  margin-bottom: 16px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+select,
+input[type="range"] {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1.05rem;
+  outline: none;
+}
+
+select:focus {
+  border-color: var(--accent);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface2);
+  padding: 0;
+  margin-top: 8px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  background: var(--border);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  width: 100%;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.btn-primary:hover {
+  background: var(--accent2);
+}
+
+.btn-success {
+  background: var(--success);
+  color: #000;
+  border-color: var(--success);
+}
+
+.btn-warn {
+  background: var(--warn);
+  color: #000;
+  border-color: var(--warn);
+}
+
+.playback {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.badge {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.badge-done {
+  background: var(--success);
+  color: #000;
+}
+
+/* ---- Stats Panel (Horizontal Bar) ---- */
+.stats-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 24px;
+}
+
+.stats-top {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-algo {
+  font-size: 1.1rem;
+  padding: 2px 12px;
+  border-radius: 6px;
+  background: rgba(79, 195, 247, 0.15);
+  color: var(--accent);
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ---- Robot List (inline in stats bar, bigger & bolder) ---- */
+.robot-list {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.robot-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.robot-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.robot-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.robot-state {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 8px;
+}
+
+.state-idle {
+  color: var(--text-dim);
+}
+
+.state-moving_to_pickup {
+  color: var(--success);
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.state-moving_to_delivery {
+  color: var(--warn);
+  background: rgba(255, 152, 0, 0.2);
+}
+
+/* ---- Legend (inline in stats bar) ---- */
+.legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1000px) {
+  .main-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .sidebar {
+    width: 100%;
+    max-width: 500px;
+  }
+  .stats-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .stat-divider {
+    width: 100%;
+    height: 1px;
+  }
+}
