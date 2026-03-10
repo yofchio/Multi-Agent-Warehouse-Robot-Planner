@@ -9,7 +9,6 @@ function App() {
   const {
     grid,
     robots,
-    tasks,
     stats,
     plan,
     scenarios,
