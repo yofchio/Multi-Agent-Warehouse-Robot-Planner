@@ -1,17 +1,49 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import logging
+import time
+from typing import Dict, Tuple
+
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Optional
-import asyncio
-import json
 
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.scenarios import SCENARIOS
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
-_engine: Optional[SimulationEngine] = None
+# Pre-computed cache: (scenario, algorithm) -> response dict
+_cache: Dict[Tuple[str, str], dict] = {}
+
+
+def _precompute_all():
+    """Run all scenario × algorithm combinations at startup."""
+    algorithms = ["cbs", "prioritized"]
+    total = len(SCENARIOS) * len(algorithms)
+    logger.info(f"Pre-computing {total} scenario/algorithm combinations...")
+    t0 = time.time()
+
+    for scenario_key, builder in SCENARIOS.items():
+        for algo in algorithms:
+            scenario = builder()
+            engine = SimulationEngine(
+                grid=scenario["grid"],
+                robots=scenario["robots"],
+                tasks=scenario["tasks"],
+                algorithm=algo,
+            )
+            snapshot = engine.solve_all()
+            plan = engine.get_full_plan()
+            _cache[(scenario_key, algo)] = {**snapshot, "plan": plan}
+            logger.info(f"  {scenario_key}/{algo}: {plan['totalFrames']} frames")
+
+    elapsed = time.time() - t0
+    logger.info(f"Pre-computation done in {elapsed:.2f}s")
+
+
+_precompute_all()
 
 
 class SolveRequest(BaseModel):
@@ -37,65 +69,7 @@ def list_scenarios():
 
 @router.post("/solve")
 def solve(req: SolveRequest):
-    global _engine
-    if req.scenario not in SCENARIOS:
-        return {"error": f"Unknown scenario: {req.scenario}"}
-    scenario = SCENARIOS[req.scenario]()
-    _engine = SimulationEngine(
-        grid=scenario["grid"],
-        robots=scenario["robots"],
-        tasks=scenario["tasks"],
-        algorithm=req.algorithm,
-    )
-    snapshot = _engine.solve_all()
-    plan = _engine.get_full_plan()
-    return {**snapshot, "plan": plan}
-
-
-@router.post("/step")
-def step():
-    global _engine
-    if _engine is None:
-        return {"error": "No active simulation. Call /solve first."}
-    return _engine.step()
-
-
-@router.websocket("/ws/simulation")
-async def simulation_ws(websocket: WebSocket):
-    global _engine
-    await websocket.accept()
-    try:
-        while True:
-            data = await websocket.receive_text()
-            msg = json.loads(data)
-
-            if msg.get("type") == "solve":
-                scenario_key = msg.get("scenario", "simple")
-                algorithm = msg.get("algorithm", "cbs")
-                if scenario_key not in SCENARIOS:
-                    await websocket.send_json({"error": f"Unknown scenario: {scenario_key}"})
-                    continue
-                scenario = SCENARIOS[scenario_key]()
-                _engine = SimulationEngine(
-                    grid=scenario["grid"],
-                    robots=scenario["robots"],
-                    tasks=scenario["tasks"],
-                    algorithm=algorithm,
-                )
-                snapshot = _engine.solve_all()
-                plan = _engine.get_full_plan()
-                await websocket.send_json({
-                    "type": "solved",
-                    **snapshot,
-                    "plan": plan,
-                })
-
-            elif msg.get("type") == "step":
-                if _engine is None:
-                    await websocket.send_json({"error": "No simulation active"})
-                else:
-                    snapshot = _engine.step()
-                    await websocket.send_json({"type": "step", **snapshot})
-
-    except WebSocketDisconnect:
-        pass
+    cache_key = (req.scenario, req.algorithm)
+    if cache_key in _cache:
+        return _cache[cache_key]
+    return {"error": f"Unknown scenario/algorithm: {req.scenario}/{req.algorithm}"}
