@@ -9,7 +9,7 @@ import type {
 } from "../types";
 import type { AnimatedRobot } from "../utils/renderer";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = import.meta.env.DEV ? "http://localhost:8000/api" : "/api";
 
 export function useSimulation() {
   const [grid, setGrid] = useState<GridData | null>(null);
